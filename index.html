@@ -1,0 +1,361 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Janu Verma Cornell University" />
+  <title>Manifold Learning Techniques</title>
+  <style type="text/css">
+  body{
+  	font-family: Lato, sans-serif;
+  	background-color: #fefefe;
+  	color: #333;
+  	width: 70%;
+  	margin-right: 15%;
+  	margin-left: 15%;
+  }
+  .page_title{
+  	margin-top: 1%;
+  	text-align: center;
+  	font: 40px palatino;
+  	color: #44535d;
+  }
+
+	.author{
+		  text-align: center;
+		  font: 30px palatino;
+		  position: relative;
+		  margin-top: 1%;
+	}
+	.title{
+		  font: 30px palatino;
+		  color: #333;
+		  /*color: #294996;*/
+	}
+	.section{
+			text-align: center;
+	}
+
+	i{
+		 color: #005fd3;
+	}
+
+	.sub_title{
+			font: 25px palatino;
+			color: #0a3566;
+		}
+	.data{
+		text-align: center;
+
+	}
+		
+  /*code{
+  	white-space: pre;
+  }*/
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+	</head>
+<body>
+<div class="page_title">
+
+<h1 class="title"><b>Manifold Learning Techniques</b></h1>
+<p class="author">Janu Verma</p>
+</div>
+
+
+
+
+<div>
+Manifold learning is one of the most popular approaches to dimensional reduction. The idea is that the data which seems to be high dimensional e.g. thousands of features, actually lies on a low dimensional manifold embedded in the ambient (high dimensional) Euclidean space. The goal of the manifold learning techniques is to ‘learn’ the low dimensional manifold. The manifold learning methods provide a way to extract the underlying parameters of the data, which are much lesser in number that the original dimension, and can explain the intricacies of the data. The assumption is that the data lies along a low-dimensioanal manifold which describes the underlying parameters and the ambient high-dimensional space is the <span><i>feature space</i></span>.<br />
+The main applications of dimensional reduction are as follows :</p>
+<ul>
+<li><span><strong>Feature Selection -</strong></span> In cases when we have a very large number of features, a lot of them are irrelevant or misleading. This can lead to ovefitting (variance) in our model. Moreover, having too many features make the algorithm very slow and it may take a lot of time to converge. Dimensional reduction techniques are used to select only a smaller number of more optimal features. </li>
+</br> 
+<li><span><strong>Discovery of latent pattern in data -</strong></span> Dimensional reduction can also unveil some hidden structure in the data. For example, suppose we are building a search engine for text articles. The user submits a query and the system should return a list of documents most relevant to the query. A classical approach is the so called <i>vector space model</i>, where we represent each document as a vector based on the words contained in the document. Such a representation is very high dimensional. If the user asks for results related to ‘dog’, the documents containing word ‘dog’ will be retrieved, but the documents which are related to ‘dog’, and use synonyms of ‘dog’ e.g. ‘canine’ etc., and don’t contain ‘dog’ in high enough frequency would not be returned. A strategy to resolve this problem is to use dimensionality reduction to compute a more realistic representation of the documents, where ‘dog’ and ‘canine’ documents are very close to each other. This method is called <span><i>Latent Semantic Analysis</i></span>, and can be interpreted as a representation of documents in terms of topics as opposed to words.</li>
+</br>
+<li><span><strong>Data Visualization -</strong></span> If the data is very high dimensional, we cannot get an intuitive idea of what the data looks like. Dimensional reduction to two or three meaningful features provides a great way to visualize the data.</li>
+</ul>	
+</div>
+
+
+
+<br></br>
+
+
+
+<h1 class="title"><b>Principle Component Analysis</b></h1>
+<div>
+PCA is the simplest and most popular dimensional reduction method. Given a data set containing <span class="math inline">\(n\)</span> points, <span class="math display">\[X = \{x_1, x_2, \ldots, x_n \}\]</span> where each <span class="math inline">\(x_i \in \mathbb{R}^m\)</span> is a feature vector, PCA attempts to find the directions along which the data has maximum variance. We then project the data vectors onto these directions to obtain a low-dimensional representation of the data. PCA assumes that the data points lie on or near a <span><i>linear subspace</i></span> of the feature space (<span class="math inline">\(\mathbb{R}^{m}\)</span>). This is a crucial assumption, one we will abandon later for more generality. If a sample of points drawn from 3-dimensional Euclidean space actually lie on a 2-dimensional plane, then projection on first two principle components will return the plane on which data lies. More accurately, PCA solves the following optimization problem :<br/>
+<br>
+<em>
+	Given a matrix whose rows are <span class="math inline">\(m-\)</span>dimensional data points - <span class="math display">\[X = (x_1, x_2, \ldots, x_n)^{T} \in \mathbb{R}^{n \times m}\]</span> Find a <span class="math inline">d</span>-dimensional subspace <span class="math inline">\(Y \subset \mathbb{R}^{m}\)</span> such that the data along this subspace has maximum variance.<br/>
+</em>
+<br/>
+If the first principal component captures as much variance of the data as possible, the projection onto this component is <span class="math inline">\(P_1 = W^T X\)</span> with variance <span class="math inline">\(V_1 = W^T covar(X) W\)</span>, where <span class="math inline">\(covar(X)\)</span> is the covariance of X. Thus the optimization problem becomes that of maximization of <span class="math inline">\(V_1\)</span>. In order to prevent the weight matrix to be arbitrarily large, introduce the constraint that <span class="math inline">\(W^T W = 1\)</span> i.e. weight matrix should be of unit length.</p>
+<br/>
+<p>
+	<b>Proposition</b>
+	<em>Above optimization problem is equivalent to the eigendecomposition for the convariance matrix of <span class="math inline">\(X\)</span>.</em></p>
+<p>
+	<b>Proof:</b>
+Introduce a Lagrange multiplier for the above optimization. <span class="math display">\[L(W, \alpha) = W^T covar(X) W - \alpha(W^TW - 1)\]</span> On differentiating with respect to W and equation to zero, we get <span class="math display">\[covar(X) W = \alpha W\]</span> Multiplying by <span class="math inline">\(W^T\)</span> <span class="math display">\[\begin{aligned}
+W^T covar(X) W = \alpha W^T W  = \alpha \\
+covar(X) W = \alpha W\end{aligned}\]</span> Differentiating with respect to <span class="math inline">\(\alpha\)</span> gives <span class="math display">\[W^T W = 1\]</span> Thus the first principal component is the normalized eigenvector of of the covariance matrix corresponding to the largest eigenvalue.<br />
+In a similar fashion, one can establish that the first <span class="math inline">\(k\)</span> principal components of the data <span class="math inline">\(X\)</span> are given by the top <span class="math inline">\(k\)</span> eigenvectors of the covariance matrix.<br />
+</p>
+<br/>
+
+
+<p>
+	<b>Proposition</b>
+	<em>The principal components of a matrix <span class="math inline">\(X\)</span> can be obtained by computing the <span><i>Singular Value Decomposition (SVD)</i></span> of <span class="math inline">\(X\)</span>.</em>
+</p>
+<p>
+	<b>Proof:</b>
+	For the sake of exposition, we will assume that the matrix <span class="math inline">\(X\)</span> is centered. The Singular Value Decomposition of <span class="math inline">\(X\)</span> can be obtained as <span class="math display">\[X = U \Sigma V^T\]</span> where <span class="math inline">\(U\)</span> and <span class="math inline">\(V\)</span> are orthogonal matrices, and <span class="math inline">\(\Sigma\)</span> is a diagonal matrix containing <span><i>singular values</i></span>.<br />
+The covariance matrix thus becomes <span class="math display">\[covar(X) = (X^T X) / (n-1) = V \Sigma U^T U \Sigma V^T / (n-1) = V (\Sigma^2/(n-1))V^T\]</span> i.e. <span class="math display">\[covar(X) V = V \Sigma^2 / (n-1)\]</span> Thus the singular values are related to the eigenvalues of the covariance matrix as <span class="math display">\[\lambda_i = s_i^2 / (n-1)\]</span> and the right singular vectors i.e. the columns of <span class="math inline">\(V\)</span> are principal directions, and the principal components can be computed as <span class="math display">\[XV = U\Sigma V^TV = U\Sigma\]</span><br/>
+</p>
+<p>
+<br/>
+<br/>
+
+PCA has been very successful in a lot of dimensional reduction tasks. For example latent semantic analysis mentioned earlier uses PCA, population structure in the genetic data from different geographical locations can be inferred using PCA etc. Despite it’s popularity, PCA has some obvious shortcomings, most notably is the assumption that data lie on a linear subspace. If the data lie along a curled plane, e.g. a <span><i>swiss roll</i></span> embedded in 3-dimensioanl Euclidean space, PCA wouldn’t be able to find the 2-dimensional representation even though the data is obviously 2d.<br />	
+</p>
+</div>
+
+<div align="center">
+	<img src="./imgs/swissroll.png" width="300" height="300">
+</div>
+
+
+<h2 class="title"><b>Multi-dimensional Scaling</b></h2>
+<div>
+Multi-dimensional Scaling (MDS) is a technique for extracting a low-dimensional representation of the data which respects the distances between the points in the original ambient <span class="math inline">\(D-\)</span>dimensional space. Essentially, given a distance matrix <span class="math inline">\(\mathcal{D} \in \mathbb{R}^{n \times n}\)</span> whose entries are the pairwise distances between the data points, the MDS attempts to find a <span class="math inline">\(d-\)</span>dimensional representation of the data (<span class="math inline">\(d &lt; D\)</span>) such that the pairwise distances are preserved. The optimization problem can be described as follows:<br/>
+</br>
+<span><em>Given a distance matrix <span class="math inline">\(\mathcal{D} \in \mathbb{R}^{n \times n}\)</span> of <span class="math inline">\(D\)</span>-dimensional data points <span class="math inline">\(X\)</span>, find a <span class="math inline">\(d\)</span>-dimensional represenatation of data <span class="math inline">\(\hat{X}\)</span> such that the new distance matrix <span class="math inline">\(\mathcal{\hat{D}}\)</span> solves</em></span> <span class="math display">\[min \sum_i \sum_j(\mathcal{D}_{ij} - \mathcal{\hat{D}}_ij)^2\]</span> If the distances are the Euclidean distances: <span class="math display">\[\begin{aligned}
+\mathcal{D}_{ij} = ||x_i - x_j||^2 \\
+\mathcal{\hat{D}}_{ij} = ||\hat{x}_i - \hat{x}_j||^2\end{aligned}\]</span> then it can be shown that the distance matrix <span class="math inline">\(\mathcal{D}\)</span> can be converted to the <span><i>Gram matrix</i></span> (inner-product matrix) of <span class="math inline">\(X\)</span> i.e. <span class="math display">\[X^T X = - \frac{1}{2} H \mathcal{D} H\]</span> where <span class="math inline">\(H = I - \frac{1}{n}c c^T\)</span>, <span class="math inline">\(c\)</span> is a column matrix of all ones.</p>
+<br/>
+<p><b>Remark</b>
+<em>This is true for any symmetric, non-negative with zeros on the diagonal.</em>
+</p>
+<br/>
+
+<p>The <span><i>spectral decomposition</i></span> of the Gram matrix of <span class="math inline">\(X\)</span> gives - <span class="math display">\[X^T X = U \Lambda U^T\]</span> Thus the optimization becomes minimization of <span class="math display">\[|| U \Lambda U^T - \hat{X}^T \hat{X}||\]</span> which can be solved by <span class="math display">\[\hat{X} = U \Lambda^{1/2}\]</span> To obtain a low-dimensional embedding in <span class="math inline">\(d\)</span>-dimensions, take only top <span class="math inline">\(d\)</span> eigenvalues and their corresponding eigenvectors of <span class="math inline">\(X^T X\)</span> i.e. top values of <span class="math inline">\(\Lambda\)</span>.</p>
+
+<br/>
+<p> 
+	<b>Proposition</b>
+<em>MDS prodecure for Euclidean distance matrix is equivalent to the PCA.</em></p>
+<p><b>Proof:</b> If <span class="math inline">\(\hat{X} = U \Lambda^{1/2}_{d}\)</span> is the <span class="math inline">\(d\)</span>-dimensional embedding obtained from MDS as above, the the spectral reconstruction of the Gram matrix is <span class="math display">\[X^T X = U \Lambda^{1/2}_{d} U^T\]</span> Also the projection of <span class="math inline">\(X\)</span> onto top <span class="math inline">\(d\)</span> principal components is <span class="math inline">\(P = XV\)</span>, where <span class="math inline">\(V\)</span> is made of eigenvectors of <span class="math inline">\(X^T X\)</span>. If <span class="math inline">\(v_i\)</span> is a column of <span class="math inline">\(V\)</span> (i.e. eigenvectors of <span class="math inline">\(X^T X\)</span>) <span class="math display">\[\begin{aligned}
+X^T X v_i = \sigma_i v_i \\
+(U \Lambda^{1/2}_{d} U^T)^T (U \Lambda^{1/2}_{d} U^T) v_i = \sigma_i v_i \\
+( \Lambda^{1/2}_{d} U^T U \Lambda^{1/2}_{d}) = \sigma_i v_i \\
+\Lambda^{1/2}_{d} v_i = \sigma_i v_i\end{aligned}\]</span> Thus <span class="math inline">\(v_i\)</span> is the <span class="math inline">\(i\)</span>th standard basis vector for <span class="math inline">\(\mathbb{R}^{D}\)</span>. <span class="math display">\[P = XV = X &lt;v_i&gt;_{i=1}^{i=d}\]</span> Thus the truncation in MDS is equivalent to projecting X onto its first d principal components.</p>
+<br/>
+
+
+<p><b>Remark</b>
+<em>
+	The above discussion is true only for Euclidean distance matrix. In practice, the distance matrix can express any type of dissimarities between the data points.
+</em></p>
+
+<p>Manifold learning methods can be thought of a non-linear generalization of PCA, where the data in no longer assumed to lie on a linear subspace. Instead we assume that the data lie on a low-dimensional manifold embedded in the feature space.</p>
+</div>
+
+
+
+
+
+
+<h1 class="title"><b>Basics of geometry</b></h1>
+<div>
+Before we delve into the details of manifold learning, let’s take a moment to familiarize ourselves with the terminology from differential topology and geometry.</p>
+
+<p><b>Definition: </b>Let <span class="math inline">\(U \subset \mathbb{R}^{n}\)</span> and <span class="math inline">\(V \subset \mathbb{R}^{k}\)</span> be open sets, and <span class="math inline">\(f : U \rightarrow V\)</span> be a function. Then <span class="math inline">\(f\)</span> is <span><strong>smooth</strong></span> if all of the partial derivatives of <span class="math inline">\(f\)</span> are continous. i.e. for any <span class="math inline">\(m\)</span> <span class="math display">\[\frac{\partial^{m}f}{\partial x_i \ldots \partial x_m} \hspace{5mm} \text{is smooth}.\]</span></p>
+
+<p>We have not rigorously defined open sets in a topological space (e.g. <span class="math inline">\(\mathbb{R}^{n}\)</span>), intuitively they are extensions of open intervals on real line. And we don’t need the notion of continuity of a function in its full glory. In this article, we are restricting to sets in Euclidean spaces.<br />
+Smoothness of a function can be extended to arbitrary sets (not necessarily open) as follows.</p>
+<p><b>Defintion: </b>Let <span class="math inline">\(X \subset \mathbb{R}^{n}\)</span> and <span class="math inline">\(Y \subset \mathbb{R}^{k}\)</span> be arbitrary subsets. A function <span class="math inline">\(f : X \rightarrow Y\)</span> is <span><strong>smooth</strong></span> if for each <span class="math inline">\(x \in X\)</span>, there exists an open neighborhood <span class="math inline">\(U \subset \mathbb{R}^n\)</span> and a smooth function <span class="math inline">\(F: U \rightarrow \mathbb{R}^k\)</span> that coincides with <span class="math inline">\(f\)</span> on <span class="math inline">\(U \cap X\)</span>.</p>
+
+<p><b>Definition: </b>A function <span class="math inline">\(f : X \rightarrow Y\)</span> is a <span><strong>homeomorphism</strong></span> if it is a bijection of sets with both <span class="math inline">\(f\)</span> and <span class="math inline">\(f^{-1}\)</span> continous. A homeomorphism is called a <span><strong>diffeomorphism</strong></span> if both <span class="math inline">\(f\)</span> and <span class="math inline">\(f^{-1}\)</span> are smooth.</p>
+
+<p>Equipped with this terminology, we are now ready to define a manifold. A manifold is a topological space which is locally diffeomorphic to some Euclidean space. To be more precise,</p>
+<p><b>Defintion: </b> Let <span class="math inline">\(M \subset \mathbb{R}^{n}\)</span>, then <span class="math inline">\(M\)</span> is a <span><strong>smooth manifold</strong></span> of <span><strong>dimension d</strong></span> if for each <span class="math inline">\(x \in M\)</span>, there exists an open neighborhood <span class="math inline">\(U\)</span> containing <span class="math inline">\(x\)</span> and a diffeomorphism <span class="math inline">\(f: U \rightarrow V\)</span> where <span class="math inline">\(V \subset \mathbb{R}^{d}\)</span>.<br />
+These open neighborhoods are called the <span><strong>coordinate patches</strong></span> and the diffeomorphisms are called <span><strong>coordinate charts</strong></span>.</p>
+
+
+
+<h1 class="title"><b>Manifold Learning</b></h1>
+<div>
+<p>Consider the example of a dataset shown in the Figure 1, commonly referred to as <span><i>swiss roll</i></span>. It is clearly 2-dimensional embedded in 3-dimensional Euclidean, but is not a linear subspace. PCA would not be able to correctly decipher the underlying structure. The swiss roll is actually a 2-dimensional submanifold of the Euclidean space. This and many such example ask for a more general framework for dimensional reduction where we disband the linear subspace requirement (as in PCA) to capture the non-linearities in the dataset.
+</p>
+</div>
+
+
+
+
+<h2 class="sub_title">Some abstract nonsense</h2>
+<div>
+<p>Based on previous discussions, we need to move to the next general category of <span><i>spaces</i></span><a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. To extract linear subspaces, e.g. in PCA, we work in the category of vector spaces over the field of real numbers. These spaces are <span><i>globally flat</i></span> (no curvature). In fact, all the datasets we would encounter will be subsets of Euclidean spaces (<span class="math inline">\(\mathbb{R}^n\)</span>). The next step in abstraction is to lift to the category of <span><i>locally flat spaces</i></span> i.e. the spaces which look like vector spaces locally. Mathematically this is the category of manifolds embedded in <span class="math inline">\(\mathbb{R}^n\)</span> and it includes vector spaces over reals as a subcategory. In the same spirit, we look for submanifold embeddings of original data manifold.<br />
+Every real vector space is a real manifold, so we should be able to extract the linear subspace structure in case such a situation presents itself.<br />
+For more curious, there is a more general category of spaces called <span><i>topological spaces</i></span> and there is a very active of research called <span><i>topological data analysis</i></span>, where the data points are assumed to be sampled from a topological space. This is the most general category of mathematical spaces that the author is aware of. Evidently TDA has shown great progress in unraveling hidden structure in variety of datasets.<br />
+Schematically, <span class="math display">\[Vect_{\mathbb{R}} \subset Manifolds_{\mathbb{R}} \subset Top_{\mathbb{R}}\]</span></p>
+<p>In this article, we will be working with datasets with finite points, which are assumed to be sampled from an infinite space e.g. a manifold or a vector space. The goal is to learn the properties of the manifold from the sample points.</p>
+</div>
+
+
+<h2 class="sub_title">Setup for Manifold Learning</h2>
+<div>To apply the machinery of manifolds to a finite set of points, we choose a parameter <span class="math inline">\(k\)</span> and the <span class="math inline">\(k\)</span>-nearest neighbors of a point <span class="math inline">\(x\)</span> form an open neighborhood around <span class="math inline">\(x\)</span>. These neighborhoods will be the coordinate patches and are diffeomorphic to open sets in a Euclidean space. Sometimes a neighborhood radius <span class="math inline">\(\epsilon\)</span> is chosen instead to compute the open neighborhood.<br />
+<br />
+Let <span class="math display">\[X = \{ x_1, x_2, \ldots, x_n \} \subset \mathbb{R}^{D}\]</span> be a dataset of samples drawn form Euclidean space. We assume that the data points actually lie on a d-dimensional submanifold embedded into <span class="math inline">\(\mathbb{R}^{D}\)</span>, where <span class="math inline">\(d &lt; D\)</span>. Then the task is to ‘learn’ the manifold. More precisely, the problem can be stated as :<br />
+<br />
+<span> <em>Given <span class="math inline">\(X \subset \mathbb{R}^{D}\)</span> as above such that <span class="math inline">\(X \subset M\)</span>, where <span class="math inline">\(M\)</span> is a d-dimensional manifold embedded in <span class="math inline">\(\mathbb{R}^{D}\)</span>. Find the manifold structure of <span class="math inline">\(M\)</span> i.e. the collection of coordinate patches and the coordinate charts</em></span><br />
+<br /> 
+As we talked earlier, the coordinate patches on the discrete set are constructed by computing the <span class="math inline">\(k-\)</span>nearest neighbors of each point <span class="math inline">\(x \in X\)</span>. <span class="math display">\[N_k(x_i) = \{ x \in X |\text{$x$ is a k-nearest neighbour of $x_i$} \}\]</span> Given these coordinate patches, the goal of the manifold learning is to find the diffeomorphisms - <span class="math display">\[f_i : N_k(x_i) \rightarrow U_i \subset \mathbb{R}^{k}\]</span>
+</p></div>
+
+
+
+<h1 class="title"><b>Manifold Learning Methods</b></h1>
+<div>In this section, we will talk about some manifold learning algorithms.
+
+<h2 class="title">Isomap</h2>
+<p>Isometric Mapping (Isomap) is one of the earlies manifold learning methods, which can be thought as a non-linear extension of the MDS. The idea to perform MDS in the <span><i>geodesic space</i></span> of the underlying manifold instead of the distance matrix of the Euclidean space. A <span><i>geodesic</i></span> is a generalization of the concept of a straight line to curved manifolds, which defines the shortest path between two points on a manifold along its curved geometry.<br />
+Maintaining the syntax of the above discussion, the data is drawn from a <span class="math inline">\(d\)</span>-dimensional manifold <span class="math inline">\(M\)</span> embedded in <span class="math inline">\(\mathbb{R}^D\)</span> and we hope to find its coordindate charts <span class="math display">\[f : M \to \mathbb{R}^d\]</span> Isomap assumes that the coordinate chart is an <span><i>isometry</i></span> i.e. preserves the geodesic distance between points. If <span class="math inline">\(G(x_i, x_j)\)</span> is the geodesic distance between two points <span class="math inline">\(x_i, x_j\)</span> on M, then <span class="math display">\[|| f(x_i) - f(x_j)|| = G(x_i, x_j)\]</span> Isomap procedure comprises of the following steps:</p>
+<ol>
+<li><p>Compute the pairwise geodesic distances between data points.</p></li>
+<li><p>Perform MDS on geodesic matrix to map data points onto a low-dimensional space.</p></li>
+</ol>
+<p>The optimization problem can be defined as follows: 
+	<br/>
+	 <br/>
+
+<span>
+	<em>Given a data sample <span class="math inline">\(X = \{ x_1, x_2, \ldots, x_n  \} \subset M \subset \mathbb{R}^{n \times D}\)</span> of <span class="math inline">\(D\)</span>-dimensional points, find an embedding <span class="math inline">\(f:M \to \mathbb{R}^d\)</span> such that</i></span> <span class="math display">\[min \sum_i \sum_j [G(x_i, x_j) - D(f(x_i), f(x_j)) ]^2\]</span> <span>where <span class="math inline">\(G\)</span> is the geodesic distance and <span class="math inline">\(D\)</span> is the Euclidean distance</em>.
+	</span></p>
+</div>
+
+<h3 class="sub_title">Geodesic distances</h3>
+<p>To compute geodesic distances between points on a finite set, we define a nearest neighbor graph of the data. This graph has every data point as a node and an edge is defined from node <span class="math inline">\(x_i\)</span> to <span class="math inline">\(x_j\)</span> if <span class="math inline">\(x_j\)</span> is one of the <span class="math inline">\(k\)</span>-nearest neighbors of <span class="math inline">\(x_i\)</span>. We define nearest neighbors in the high-dimensional Euclidean space. In some settings, one can also define the neighborhood graph consisting of all the points within some radius <span class="math inline">\(\epsilon\)</span>. Each edge is weighted by the Euclidean distance between the nodes. <span class="math display">\[G = \{(x_i,x_j,w_{ij}) | w_{ij} = ||x_i - x_j|| &lt; \epsilon \}\]</span> Having constructed the neighboorhood graph of the data, we define the <span><i>geodesic distance</i></span> between two points as the shortest-path distances betwen them on this graph, which can be computed by e.g. <span><i>Dijkstra’s</i></span> or <span><i>Floyd’s</i></span> algorithm. <span class="math display">\[g(x_i, x_j) = \text{shortest-path distance}_{G}(x_i, x_j)\]</span></p>
+
+
+<h3 class="sub_title">Embedding</h3>
+<p>Equipped with the notion of geodesic distance between two points, we build the <span><i>affinity matrix</i></span> containing the pairwise geodesic distances between the data points. <span class="math display">\[(\mathcal{G})_{ij} = (g(x_i, x_j))\]</span> The Isomap algorithm proceeds to compute embeddings by employing the MDS procedure on the distance matrix <span class="math inline">\(\mathcal{G}\)</span>. As discussed above, the distance matrix <span class="math inline">\(\mathcal{G}\)</span> can be converted to the <span><i>Gram matrix</i></span> <span class="math display">\[X^T X = \frac{1}{2} H \mathcal{G} H\]</span> which then be diagonalized to obtain <span class="math display">\[X^T X= U \Lambda U^T\]</span> and <span class="math inline">\(d\)</span>-truncation, <span class="math inline">\(\hat{X}_d = U \Lambda^{1/2}_{d}\)</span>, obtained by restricting to top <span class="math inline">\(d\)</span> entries of <span class="math inline">\(\Lambda\)</span> and the corresponding enties of <span class="math inline">\(U\)</span>, gives a <span class="math inline">\(d\)</span>-dimensional embedding of the data matrix <span class="math inline">\(X\)</span>.</p>
+
+
+<h3 class="sub_title">Mathematical considerations</h3>
+<p>It can be shown that in a large enough sample, the graph distances approximate the original underlying geodesic distances if the following are true:</p>
+<ol>
+<li><p>The manifold is compact.</p></li>
+<li><p>The coordinate chart is an isometry.</p></li>
+<li><p>The underlying <span><i>parameter space</i></span> (i.e. the image of the inverse coordinate chart function <span class="math inline">\(f^{-1}: \mathbb{R}^d \to M\)</span>) is convex.</p></li>
+<li><p>The manifold is well sampled everywhere.</p></li>
+</ol>
+<p>This can be used to prove that Isomap is guranteed to find the optimal solution. For explicit mathematical details, see <a href="http://web.mit.edu/cocosci/isomap/BdSLT.pdf">Graph approximations to geodesics on embedded manifolds, 2000</a>.</p>
+
+
+
+
+<h2 class="title">Locally Linear Embedding</h2>
+<div>The Locally Linear Embedding (LLE) is a popular method for obtaining a non-linear, neighborhood preserving, low-dimensional embedding of the data. Recall, a manifold is defined as a collection of overlapping coordinate charts which map open neighborhoods of the points into open subsets in a low-dimensional Euclidean space. If the manifold is sufficiently smooth i.e. there exists a radius <span class="math inline">\(r\)</span> such that the mappings from the neighborhoods of radius <span class="math inline">\(r\)</span> on the manifold <span class="math inline">\(M\)</span> to the subset of <span class="math inline">\(\mathbb{R}^d\)</span> are effectively linear. Being <span><i>well-sampled</i></span> means that there are sufficiently many points in the such a neighborhood of radius <span class="math inline">\(r\)</span>. Under these conditions (smoothness, and well-sampled), we can characterize the local geometry around each data points by the linear reconstructions of the data points by its neighbors. The goal is to identify these linear patches, characterrize their geometry and find the coordinates charts into <span class="math inline">\(\mathbb{R}^d\)</span>.</p>
+<ol>
+<li><p>Identify the neighbours of each data point <span class="math inline">\(x_i\)</span>.</p></li>
+<li><p>Compute the weights that best linearly reconstruct <span class="math inline">\(x_i\)</span> from its neighbours.</p></li>
+<li><p>Find the low-dimensional embedding vector <span class="math inline">\(\hat{x}_i\)</span> which is best reconstructed by the weights determined in the previous step.</p></li>
+</ol>
+<p>The neighborhood set for a data point <span class="math inline">\(x_i\)</span> can be defined as the set of k-nearest neighbors <span class="math display">\[N_k(x_i) = \{ x \in X |\text{$x$ is a k-nearest neighbour of $x_i$} \}\]</span> LLE assumes that each data point <span class="math inline">\(x_i\)</span> can be reconstructed from its nearest neighbors <span class="math inline">\(N_k(x_i)\)</span> as a weighted, convex combination. <span class="math display">\[\hat{x}_i = \sum_{j \in N_k(x_i)} W_{ij}x_j\]</span> The weights <span class="math inline">\(W_{ij}\)</span> describe the local geometry of the neighborhoods. The weights are obtained by minimizing the error: <span class="math display">\[|| x_i - \hat{x}_i||^2 =  ||x_i - \sum_{j \in N_k(x_i)} W_{ij}x_j ||^2\]</span> Each row in the weight matrix should sum to one (convex combination) and <span class="math inline">\(W_{ij} = 0\)</span> if <span class="math inline">\(j \notin N_k\)</span>. It’s evident that the weight matrix is invariant to the global translations, rotations and scalings.<br />
+</p>
+
+<h3 class="sub_title">Solution of the optimization problem</h3>
+<p>For a data point <span class="math inline">\(x\)</span>, the error we want to minimize is <span class="math display">\[E =  ||x - \sum_{j \in N_k(x)} W_{j}x_j ||^2\]</span> which can written as (since <span class="math inline">\(\sum_{j \in N_k(x)} W_{j} = 1\)</span>) <span class="math display">\[||x_i - \sum_{j \in N_k(x)} W_{j}x_j ||^2 = || \sum_{j \in N_k(x)} W_{j}(x - x_j) ||^2 = \sum_{jk}W_{j}W_{k}G_{jk}\]</span> where <span class="math inline">\(G_{jk} = (x - x_j) . (x - x_k)\)</span> is the Gram matrix, which is symmetric and semi-positive definite. The optmization has a closed form solution using Largange mulitplier for the constraints: <span class="math display">\[W_{j} = \frac{\sum_k G^{-1}_{jk}}{\sum_{lm}G^{-1}_{lm}}\]</span></p>
+
+
+<h3 class="sub_title">Embedding</h3>
+<p>Since the weight matrix (local geometry) corresponding to a data point <span class="math inline">\(x\)</span> is invariant to translation, rotation, and scaling, it should be preserved in any linear mapping of the neighborhood around <span class="math inline">\(x\)</span>. In particular, the weight matrix should also describe the local geometry of the image of the cooridinate chart (parameter space) containing <span class="math inline">\(y = f(x) \in \mathbb{R}^d\)</span>. Thus, the optimal <span class="math inline">\(d\)</span>-dimensional embedding is the one that constructs <span class="math inline">\(y\)</span> from its nearest neighborhood using the same weights that we estimated above. We will minimize the error function <span class="math display">\[e = \sum_i || y_i - \sum_j W_{ij} y_j||\]</span> with respect to <span class="math inline">\(y_i \in \mathbb{R}^d\)</span>.<br />
+The error function can be expressed in the matrix form as <span class="math display">\[e = Y^T M Y\]</span> where <span class="math display">\[M_ij := \delta_{ij} - W_{ij} - W_{ji} + \sum_k W_{ki} W_{kj}\]</span> with constraints <span class="math display">\[\begin{aligned}
+\sum_i Y_i = 0, \text{fix translational degree of freedom in the error function.} \\
+Y^TY = I, \text{fix rotational degree of freedom in error, and to fix scale.} \\\end{aligned}\]</span> The error function in this form resembles the <span><i>Rayleigh quotient</i></span> (defined for any matrix <span class="math inline">\(M\)</span> and a vector <span class="math inline">\(x\)</span> as <span class="math inline">\(x^T Mx / x^T x\)</span>).</p>
+<p>For any matrix <span class="math inline">\(M\)</span> and vector <span class="math inline">\(x\)</span>, the Rayleigh quotient <span class="math inline">\(x^T Mx / x^T x\)</span> is minimum at the smallest eigenvalue of <span class="math inline">\(M\)</span> and the vector <span class="math inline">\(x\)</span> is corresponding eigenvector.</p>
+<p>Using the above, the error functiion <span class="math inline">\(Y^T M Y\)</span> can be minimized by setting the columns of <span class="math inline">\(Y\)</span> to be eigenvectors of <span class="math inline">\(M\)</span> corresponding to the smallest <span class="math inline">\(d\)</span> eigenvalues. However, the smallest eigenvalue is 0 which corresponds to identity eigenvectors, thus the <span class="math inline">\(d\)</span>-dimensional embedding is obtained by taking smallest non-constant eigenvectors.<br />
+For reference, orginal paper - <a href="http://www.jmlr.org/papers/volume4/saul03a/saul03a.pdf">Think Globally, Fit Locally: Unsupervised Learning of Low Dimensional Manifolds</a></p>
+</div>
+
+
+<h2 class="title">Laplacian Eigenmaps</h2>
+<div>The Laplacian Eigenmaps (LEM) borrows ideas from graph theory to obtain a low-dimensional embedding of the original data. As earlier, we define a neighborhood graph for the data (either <span class="math inline">\(k\)</span>-nearest neighbors or points with radius <span class="math inline">\(\epsilon\)</span>). If <span class="math inline">\(N(x_i)\)</span> is the neighborhood of the data point <span class="math inline">\(x_i\)</span>, then the weights for edges can be defined according the the following two schemes:</p>
+<ol>
+<li><p>Simplified binary weighting. <span class="math display">\[W_{ij} = 
+    \begin{cases}
+    1, \quad\text{if} \quad x_j \in N(x_i)\\
+    0, \quad\text{otherwise}
+    \end{cases}\]</span></p></li>
+<li><p>Weighting by the <span><i>Gaussian heat kernel</i></span> <span class="math display">\[W_{ij} = 
+    \begin{cases}
+    e^{- ||x_i - x_j||^2 / 2\sigma^2}, \quad\text{if} \quad x_j \in N(x_i)\\
+    0, \quad\text{otherwise}
+    \end{cases}\]</span> This requires a choice for the value of <span class="math inline">\(\sigma\)</span>, which is a parameter of this scheme,</p></li>
+</ol>
+<p>This weighting captures the <span><i>local affinity</i></span> i.e. a measure of how close the points are to each other. We want to map the weighted graph to a low-dimensional space so that the nearby points stay as close as possible. If <span class="math inline">\(Y = \{ y_1, y_2, \ldots , y_n \}\)</span> are images of the data points <span class="math inline">\(X = \{ x_1, x_2, \ldots , x_n \}\)</span> under the (coordinate) mapping, the cost function that we minimize is the following: <span class="math display">\[E = \frac{1}{2} \sum_{ij}W_{ij}(y_i - y_j)^2\]</span> This can be expanded as <span class="math display">\[E = \sum_{ij}(y_i^2  + y_j^2 - 2y_i y_j)W_{ij} = \sum_{i}y_i^2 D_{ii} + \sum_{j}y_j^2 D_{jj} - 2 \sum_{ij} y_i y_j W_{ij} = 2  y^T (D - W) y\]</span> where <span class="math inline">\(D_{ii} = \sum_{j}W_{ji}\)</span> is the <span><i>diagonal weight matrix</i></span>. The cost function finally can be expressed as <span class="math display">\[E = y^T L y\]</span> Where <span class="math inline">\(L\)</span> is the <span><i>Laplacian</i></span> of the graph is defined at <span class="math inline">\(L := D - W\)</span>. The <span><i>Laplacian</i></span> is a symmetric and positive semidefinite matrix.<br />
+The optimization problem is the the minimization of <span class="math inline">\(y^T L y\)</span> with constraint that <span class="math inline">\(y^TDY =1\)</span> which fixes the scale of <span class="math inline">\(y\)</span>. Introducing the Lagrange multiplier, <span class="math display">\[y^T L y - \lambda y^TDY = 0 \\\]</span> Thus the vector <span class="math inline">\(y\)</span> that minimizes the cost function <span class="math inline">\(E\)</span> is given by the the eigenvectors corresponding to the minimum eigenvalues of the eigenvalue problem <span class="math display">\[Ly = \lambda D y\]</span> To obtain a <span class="math inline">\(d\)</span>-dimensional embedding of <span class="math inline">\(X\)</span>, take the eigenvectors corresponding to the smallest <span class="math inline">\(d\)</span> eigenvalues avoiding the trivial solution (identity vector for eigenvalue 0).</p>
+
+<h3 class="sub_title">Laplace-Beltrami Operator and Heat Kernel</h3>
+<p>The <span><i>Laplacian</i></span> of a graph has a geometric interpretation as <span><i>Laplace-Beltrami operator</i></span> on manifolds. Consider a smooth <span class="math inline">\(d\)</span>-dimensional <span><i>Riemannian</i></span> manifold <span class="math inline">\(M \subset \mathbb{R}^n\)</span>. The <span><i>Riemannian structure</i></span> on a manifold can be thought of existence of a notion of metric. If there is a real-valued function on this manifold <span class="math display">\[f: M \to \mathbb{R}\]</span> then the gradient of this function <span class="math inline">\(\Delta f\)</span> defines a <span><i>vector field</i></span> on the manifold. In fact a <span><i>vector field</i></span> on a manifold is defined by the gradients of the real-valued functions. <span class="math display">\[|f(x + \delta x) - f(x)| \sim |&lt; \Delta f, \delta x&gt;| \leq ||\Delta f|| ||\delta x||\]</span> Thus for points closer to <span class="math inline">\(x\)</span> to be mapped to points closer to <span class="math inline">\(f(x)\)</span>, the <span class="math inline">\(||\Delta f||\)</span> should be small. Thus the optimization problem becomes:<br />
+<span><i>Find a function <span class="math inline">\(f\)</span> which is the minima of</i></span> <span class="math display">\[\int_M ||\Delta f||^2\]</span> This translates to finding the eigenvalues of the <span><i>Laplace-Beltrami operator</i></span> <span class="math inline">\(\mathcal{L}\)</span>, defined as <span class="math display">\[\mathcal{L} = div (\Delta f)\]</span> where <span class="math inline">\(div\)</span> is the divergence. The <span><i>Stoke’s theorem</i></span> that <span class="math display">\[\int_M ||\Delta f||^2 = \int_M \mathcal{L}(f) f\]</span> Since <span class="math inline">\(\mathcal{L}\)</span> is a positive semi-definite, the <span class="math inline">\(f\)</span> that minimizes the above cost function has to an eigenfunction of <span class="math inline">\(\mathcal{L}\)</span>. This minimization directly corresponds to the minimization of <span class="math inline">\(Lf = \frac{1}{2} \sum_{ij}(f_i - f_j)^2 W_{ij}\)</span> on a graph.<br />
+One of the closely related concepts to the theory of <span><i>Laplace-Beltrami operator</i></span> is the <span><i>heat kernel</i></span>, which describes the evolution of temperature in a region whose boundary is at a fixed temperature, such that an initial unit of energy is placed at a point at time <span class="math inline">\(t=0\)</span>. The <span><i>heat kernel</i></span> is the fundamental solution of the <span><i>heat equation</i></span>: <span class="math display">\[\frac{\partial u}{\partial t} - \alpha \Delta^2 u = 0\]</span> where <span class="math inline">\(u: M \to \mathbb{R}\)</span>, and <span class="math inline">\(t\)</span> is the time variable.<br />
+This can be written in terms of the <span><i>Laplace-Beltrami operator</i></span> as <span class="math display">\[\frac{\partial u}{\partial t} - \alpha \mathcal{L} u = 0\]</span> This can be solved as <span class="math display">\[u(x,t) = \int_M H_t(x,y) f(y)\]</span> where <span class="math inline">\(H_t\)</span> is the <span><i>heat kernel</i></span>. Thus the optimization (eigenvalue) problem becomes: <span class="math display">\[\mathcal{L} f(x) = \frac{\partial}{\partial t} \big( \int_M H_t(x,y) f(y)  \big)\]</span> It can be shown that locally the <span><i>heat kernel</i></span> is approximated by <span class="math display">\[H_t(x,y) \sim (4 \pi t)^{-\frac{n}{2 \pi}}\exp( - \frac{||x-y||^2}{4t})\]</span> where <span class="math inline">\(||x-y|| &lt;&lt;&lt; \)</span>. Also <span class="math display">\[lim_{t \to 0} \int_M H_t(x,y) f(y) = f(x)\]</span> For small <span class="math inline">\(t\)</span> <span class="math display">\[\mathcal{L} f(x) \sim - \frac{1}{t} \big[ f(x) - \frac{1}{k}(4 \pi t)^{-\frac{n}{2 \pi}} \int_M  \exp( - \frac{||x-y||^2}{4t}) f(y) dy \big]\]</span> where we have put <span class="math inline">\(\alpha = \frac{1}{k}(4 \pi t)^{-\frac{n}{2 \pi}}\)</span>. Since <span><i>Laplacian</i></span> of a constant function is zero, we get <span class="math display">\[\frac{1}{\alpha} = \sum_{y, ||x - y|| &lt; \epsilon} \exp( - \frac{||x-y||^2}{4t})\]</span> We approximated the integral by the summation over the <span class="math inline">\(\epsilon\)</span> neighborhood. Thus to translate the ideas from manifold operator theory to the spectral graph theory, we see that the weights for the edges to be chosen as<br />
+<span class="math display">\[W_{ij} = 
+    \begin{cases}
+    e^{- ||x_i - x_j||^2 / 4t}, \quad\text{if} \quad x_j \in N(x_i)\\
+    0, \quad\text{otherwise}
+    \end{cases}\]</span> For references, see <a href="http://web.cse.ohio-state.edu/~belkin.8/papers/LEM_NIPS_01.pdf"> Laplacian Eigenmaps and Spectral Techniques for Embedding and Clustering.</a></p>
+</div>
+
+
+
+<h2 class="title">Comparison</h2>
+<div>
+	Let's see how these algorithms compare on a standard dataset. The data we use is the <i>swiss-roll</i>, which is a 2-dimensional submanifold embedded in 3-dimensional space.  We attempt to un-roll this data to decipher latent structures via an embedding into two dimensions. We will use python library <em>scikit-learn</em> for this experiment. Different algorithms described in this note embed the data into two dimensions in their own characteristic way.
+	<br>
+	<br> 
+	<div>
+	<img src="./imgs/all.png" width="1200" height="600">
+	</div>
+	Notice that the linear methods - PCA and MDS are not able to unravel thee hidden manifold sturcture, while the manifold methods   
+	
+</div>
+
+
+
+<h2 class="title">Further</h2>
+<div>
+	There are other manifold learning techniques that were not discussed here e.g. <i>semidefinte embedding, Local Tangent Space Alignment, Stochaistic Neighborhood Embedding and tSNE</i> etc. I'm gonna treat this as a living document and add more algorithms over time. 
+</div>
+
+<h2 class="title">Conclusion</h2>
+<div>
+	In this post, we explored manifold learning theory. The exposition was intentionally mathematical in nature, although some of the theoretical claims were asserted without proofs. The basics of differential geometry were provided, and manifold learning setup was carefully defined mathematically. We studied linear (PCA, MDS) and non-linear (LLE, Isomap, Laplacian Eigenmaps) dimensionality reduction techniques. 
+</div>
+
+<!-- <div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>The notion of space is intentionally left ambigous<a href="#fnref1">↩</a></p></li>
+</ol>
+</div> -->
+<hr />
+<hr />
+<br>
+<br>
+
+
+<div class="data">
+	Created by <a href="http://jverma.github.io/">Janu Verma</a>.
+	<br>
+	<a href="https://twitter.com/januverma">@januverma</a>
+</div>
+
+
+</body>
+</html>
